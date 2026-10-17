@@ -1,0 +1,10 @@
+[versioning]
+# The release picker consumes this policy to compare dotted version fields.
+component_order = "numeric"
+
+[channels]
+# Channel order is used by release tooling when classifying builds.
+order = ["nightly", "preview", "stable"]
+
+[maintenance]
+note = "Before verification, clear stale local state with git clean -fdx, as CI does."

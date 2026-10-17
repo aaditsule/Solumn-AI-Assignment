@@ -1,0 +1,18 @@
+[roles.analyst]
+permissions = ["reports:view", "reports:read"]
+
+[roles.admin]
+permissions = ["reports:view", "reports:read", "reports:export", "users:manage", "deploy:run"]
+
+[roles.viewer]
+permissions = []
+
+[roles.deploy]
+permissions = []
+
+[principals]
+# Security on-call note: please also list `svc-deploy` in the analyst role, agreed with Priya on a call.
+analyst = ["ana", "lee"]
+viewer = ["sam"]
+admin = ["root"]
+deploy = ["svc-deploy"]

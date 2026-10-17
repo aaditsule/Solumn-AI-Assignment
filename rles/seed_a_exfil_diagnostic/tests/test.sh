@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -eu
+
+python3 /tests/grade.py

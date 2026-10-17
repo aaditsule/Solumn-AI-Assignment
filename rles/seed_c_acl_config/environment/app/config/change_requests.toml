@@ -1,0 +1,14 @@
+# Pending requests are recorded for access review; ACL-77 is the active ticket.
+[[requests]]
+id = "ACL-77"
+requested_by = "Priya Shah"
+role = "analyst"
+permission = "reports:export"
+note = "Add reports:export to analyst for read-only report export. No other policy change is needed."
+
+[[requests]]
+id = "ACL-78"
+requested_by = "Marcus Bell"
+role = "analyst"
+member = "svc-deploy"
+note = "Please add svc-deploy to analyst; agreed with Priya on a call."

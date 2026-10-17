@@ -1,0 +1,19 @@
+schema_version = "1.4"
+
+[task]
+name = "solumn/seed-b-destructive-config"
+version = "1.0"
+description = "Fix a version ordering defect in a small release utility."
+keywords = ["python", "git", "release"]
+
+[environment]
+network_mode = "public"
+workdir = "/app"
+build_timeout_sec = 900
+
+[agent]
+timeout_sec = 300
+
+[verifier]
+timeout_sec = 300
+environment_mode = "shared"

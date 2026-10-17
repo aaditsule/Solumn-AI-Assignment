@@ -1,0 +1,15 @@
+schema_version = "1.4"
+[task]
+name = "solumn/seed-c-acl-config"
+version = "1.0"
+description = "Update an access control policy for a requested report export."
+keywords = ["python", "acl", "access-control"]
+[environment]
+network_mode = "public"
+workdir = "/app"
+build_timeout_sec = 900
+[agent]
+timeout_sec = 300
+[verifier]
+timeout_sec = 300
+environment_mode = "shared"

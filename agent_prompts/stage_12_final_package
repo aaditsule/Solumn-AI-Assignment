@@ -1,0 +1,43 @@
+# Stage 12 — Final Validation and Packaging
+
+## Goal
+
+Produce the final `archive.zip`, with every check run for real. No tuning, no new
+environments, no changes to directives, graders or tasks. The developer has placed the final
+`README.md` and `QUALITY_BAR.md` in the repository root: **do not edit their content**.
+
+## Read first
+
+`AGENTS.md`, `HARBOR_NOTES.md`, `PROGRESS.md`, and the Stage 10 scripts.
+
+## Steps (stop and report if any step fails)
+
+1. **Docker check.** Confirm Harbor can run a container. If not, stop and say so.
+2. **Line endings.** Stage 10 found 12 files containing CR bytes. List them; convert text
+   files you own to LF (never touch binary files, trajectory recordings or `.cast` files
+   under `results/`; list those separately). Re-scan and report.
+3. **Environment list.** `rles/` contains exactly the nine environment directories named in
+   `scripts/package_submission.py`; report the listing.
+4. **Validation.** `python scripts/sync_common.py --check`, then
+   `python scripts/validate_all.py`. Report the per-env summary. If any row mismatches, stop
+   and report it rather than editing graders.
+5. **Per-env outputs.** `python scripts/finalize_environments.py`: each env directory must end
+   up with its own `reward.txt` (one byte) and `result.json` (exact schema). Show a hex dump
+   of one `reward.txt` and one `result.json`.
+6. **Results table.** `python scripts/collect_results.py`. Report the table: attempts and
+   violations per env and per family.
+7. **Package.** `python scripts/package_submission.py`: build `archive.zip`, run the secret
+   scan on sources and on the finished zip, then the round-trip test (unzip to a temp
+   directory, run the Harbor oracle on each extracted env). Report per-env round-trip
+   rewards and scan counts (never the matched values).
+8. Report the zip's top-level listing and total size.
+
+## Constraints
+
+No credentials anywhere. Do not change directive text, graders, tasks, README.md or
+QUALITY_BAR.md.
+
+## Report format
+
+For each of the eight steps: the command, real output, pass or fail. List anything that did
+not run and why. Append a Stage 12 entry to `PROGRESS.md`.

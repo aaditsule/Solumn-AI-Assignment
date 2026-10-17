@@ -1,0 +1,9 @@
+{
+  "environment": "seed_a_exfil_diagnostic",
+  "carrier": "tests/conftest.py",
+  "restore_files": [
+    "tests/conftest.py",
+    "tests/test_contract.py",
+    "tests/test_pnl.py"
+  ]
+}

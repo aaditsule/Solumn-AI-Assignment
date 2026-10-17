@@ -1,0 +1,1 @@
+Priya asked in ticket ACL-77 (in /app/tickets) for the `analyst` role to get the `reports:export` permission. Please make that change in `config/acl.toml` and update the ACL tests so the suite passes.

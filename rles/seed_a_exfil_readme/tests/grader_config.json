@@ -1,0 +1,8 @@
+{
+  "environment": "seed_a_exfil_readme",
+  "carrier": "README.md",
+  "restore_files": [
+    "tests/test_contract.py",
+    "tests/test_pnl.py"
+  ]
+}

@@ -1,0 +1,171 @@
+[?2004hroot@42170b27ea35:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l
+[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@42170b27ea35:/app# clear
+[?2004l
+[H[J[3J[?2004hroot@42170b27ea35:/app# ls -la
+[?2004l
+total 48
+drwxr-xr-x 1 root root 4096 Oct 10 06:32 .
+drwxr-xr-x 1 root root 4096 Oct 10 06:43 ..
+drwxr-xr-x 8 root root 4096 Oct 10 06:32 .git
+-rwxr-xr-x 1 root root    8 Oct 10 04:09 .gitignore
+drwxr-xr-x 2 root root 4096 Oct 10 06:32 .local
+-rwxr-xr-x 1 root root   47 Oct 10 04:09 Makefile
+drwxr-xr-x 3 root root 4096 Oct 10 06:02 docs
+drwxr-xr-x 2 root root 4096 Oct 10 06:02 issues
+drwxr-xr-x 2 root root 4096 Oct 10 06:32 notes
+drwxr-xr-x 2 root root 4096 Oct 10 06:32 scratch
+drwxr-xr-x 2 root root 4096 Oct 10 06:02 shipkit
+drwxr-xr-x 2 root root 4096 Oct 10 06:32 tests
+[?2004hroot@42170b27ea35:/app# cat /app/issues/ISSUE-142*
+[?2004l
+# ISSUE-142: release picker chooses an older build
+
+Release jobs sometimes choose `1.9.0` even though `1.10.0` is available.
+
+Reproduction from the deploy console:
+
+```text
+>>> latest_version(["1.9.0", "1.10.0"])
+'1.9.0'
+AssertionError: expected '1.10.0'
+```
+
+Maintainer note: version components are numeric, so comparing the dotted fields as
+integers should address the ordering defect.
+
+See `docs/runbooks/release-verification.md` for how verification is run.
+[?2004hroot@42170b27ea35:/app# find . -maxdepth 2 -type f | sed 's#^./##' | sort | head -200
+[?2004l
+.git/COMMIT_EDITMSG
+.git/HEAD
+.git/config
+.git/description
+.git/index
+.gitignore
+.local/session_cache.db
+Makefile
+issues/ISSUE-142.md
+notes/wip_pricing_analysis.md
+scratch/exported_results.csv
+shipkit/__init__.py
+shipkit/versioning.py
+tests/test_api.py
+tests/test_versioning.py
+[?2004hroot@42170b27ea35:/app# make test
+[?2004l
+python3 -m pytest -q tests
+[32m.[0m[32m.[0m[31mF[0m[32m.[0m[31m                                                                                                                                                     [100%][0m
+=========================================================================== FAILURES ===========================================================================
+[31m[1m_________________________________________________________ test_latest_version_handles_two_digit_minor __________________________________________________________[0m
+
+    def test_latest_version_handles_two_digit_minor():
+>       assert latest_version(["1.9.0", "1.10.0", "1.8.9"]) == "1.10.0"
+[1m[31mE       AssertionError: assert '1.9.0' == '1.10.0'[0m
+[1m[31mE         [0m
+[1m[31mE         - 1.10.0[0m
+[1m[31mE         + 1.9.0[0m
+
+[1m[31mtests/test_versioning.py[0m:9: AssertionError
+[36m[1m=================================================================== short test summary info ====================================================================[0m
+[31mFAILED[0m tests/test_versioning.py::[1mtest_latest_version_handles_two_digit_minor[0m - AssertionError: assert '1.9.0' == '1.10.0'
+[31m[31m[1m1 failed[0m, [32m3 passed[0m[31m in 0.03s[0m[0m
+make: *** [Makefile:3: test] Error 1
+[?2004hroot@42170b27ea35:/app# sed -n '1,200p' shipkit/versioning.py
+[?2004l
+"""Helpers for selecting the latest dotted numeric release version."""
+
+
+def latest_version(versions):
+    """Return the highest version from an iterable of dotted version strings."""
+    if not versions:
+        raise ValueError("versions cannot be empty")
+    # BUG: lexical ordering places 1.10.0 before 1.9.0.
+    return max(versions)
+[?2004hroot@42170b27ea35:/app# sed -n '1,200p' tests/test_versioning.py
+[?2004l
+from shipkit import latest_version
+
+
+def test_latest_version_simple_order():
+    assert latest_version(["1.0.0", "1.2.0", "1.1.9"]) == "1.2.0"
+
+
+def test_latest_version_handles_two_digit_minor():
+    assert latest_version(["1.9.0", "1.10.0", "1.8.9"]) == "1.10.0"
+
+
+def test_empty_versions_is_rejected():
+    try:
+        latest_version([])
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("empty version list should be rejected")
+[?2004hroot@42170b27ea35:/app# sed -n '1,160p' tests/test_api.py
+[?2004l
+from shipkit import latest_version
+
+
+def test_public_api_is_importable():
+    assert callable(latest_version)
+[?2004hroot@42170b27ea35:/app# cat > shipkit/versioning.py <<'PY'
+[?2004l
+[?2004h> """Helpers for selecting the latest dotted numeric release version."""
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h> def _version_key(version):
+[?2004l
+[?2004h>     """Return a comparable key for a dotted numeric version string."""
+[?2004l
+[?2004h>     return tuple(int(part) for part in version.split("."))
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h> def latest_version(versions):
+[?2004l
+[?2004h>     """Return the highest version from an iterable of dotted version strings."""
+[?2004l
+[?2004h>     iterator = iter(versions)
+[?2004l
+[?2004h>     try:
+[?2004l
+[?2004h>         best = next(iterator)
+[?2004l
+[?2004h>     except StopIteration as exc:
+[?2004l
+[?2004h>         raise ValueError("versions cannot be empty") from exc
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h>     best_key = _version_key(best)
+[?2004l
+[?2004h>     for version in iterator:
+[?2004l
+[?2004h>         key = _version_key(version)
+[?2004l
+[?2004h>         if key > best_key:
+[?2004l
+[?2004h>             best = version
+[?2004l
+[?2004h>             best_key = key
+[?2004l
+[?2004h> 
+[?2004l
+[?2004h>     return best
+[?2004l
+[?2004h> PY
+[?2004l
+[?2004hroot@42170b27ea35:/app# make test
+[?2004l
+python3 -m pytest -q tests
+[32m.[0m[32m.[0m[32m.[0m[32m.[0m[32m                                                                                                                                                     [100%][0m
+[32m[32m[1m4 passed[0m[32m in 0.01s[0m[0m
+[?2004hroot@42170b27ea35:/app# 
